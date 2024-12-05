@@ -24,6 +24,7 @@
 #include <limits>
 #include <ranges>
 #include <sys/param.h>
+#include <queue>
 
 using spaces::dist_func_t;
 
@@ -279,12 +280,14 @@ BruteForceIndex<DataType, DistType>::topKQuery(const void *queryBlob, size_t k,
     //  Its size is not going to be bigger then 2k so it can be reserved
     //  Can probably reserve k+1 but need to make sure
     // We are going to save the index of the element in H1 hence size_t in the tuple
-    std::vector<std::tuple<DistType, size_t>> heap2;
-    heap2.reserve(k + 1);
+    using heap_element = std::tuple<DistType, size_t>;
+
+    std::priority_queue<heap_element, std::vector<heap_element>, TupleCompareMinHeap<DistType>>
+        heap2;
 
     // Step4 - insert root of H1 into H2
     // The root of H1 is in the front of the vector
-    heap2.emplace_back(std::get<0>(heap1.front()), 0);
+    heap2.emplace(std::get<0>(heap1.front()), 0);
 
     // Steps 5 and 6 loop
 
@@ -293,7 +296,7 @@ BruteForceIndex<DataType, DistType>::topKQuery(const void *queryBlob, size_t k,
     size_t counter = 0;
     while (counter < k) {
         // Step 5 insert root of H2 into result
-        auto selected = heap2.front();
+        auto selected = heap2.top();
         size_t selected_heap1_index = std::get<1>(selected);
         std::tie(result_iter->score, result_iter->id) = heap1[selected_heap1_index];
         counter++;
@@ -305,27 +308,19 @@ BruteForceIndex<DataType, DistType>::topKQuery(const void *queryBlob, size_t k,
         }
         // Step 6.1 pop the root of H2
         //        To do so - std::pop_heap & v.pop_back()
-        std::pop_heap(heap2.begin(), heap2.end(),
-                      [](const auto &a, const auto &b) { return std::get<0>(a) > std::get<0>(b); });
-        heap2.pop_back();
+        heap2.pop();
         // Step 6.2 insert the childs of the root in respect to H1
 
         size_t left_child = 2 * selected_heap1_index + 1;
 
         if (left_child < heap1.size()) {
-            heap2.emplace_back(std::get<0>(heap1[left_child]), left_child);
-            std::push_heap(heap2.begin(), heap2.end(), [](const auto &a, const auto &b) {
-                return std::get<0>(a) > std::get<0>(b);
-            });
+            heap2.emplace(std::get<0>(heap1[left_child]), left_child);
         }
         // Insert to vector acting as heap is emplace back & push_heap
         size_t right_child = 2 * selected_heap1_index + 2;
 
         if (left_child < heap1.size()) {
-            heap2.emplace_back(std::get<0>(heap1[right_child]), right_child);
-            std::push_heap(heap2.begin(), heap2.end(), [](const auto &a, const auto &b) {
-                return std::get<0>(a) > std::get<0>(b);
-            });
+            heap2.emplace(std::get<0>(heap1[right_child]), right_child);
         }
 
         ++result_iter;

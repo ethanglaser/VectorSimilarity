@@ -90,3 +90,11 @@ const char *VecSimMetric_ToString(VecSimMetric vecsimMetric);
 const char *VecSimSearchMode_ToString(VecSearchMode vecsimSearchMode);
 
 size_t VecSimType_sizeof(VecSimType vecsimType);
+
+template <typename datatype>
+struct TupleCompareMinHeap {
+    bool operator()(const std::tuple<datatype, size_t> &a,
+                    const std::tuple<datatype, size_t> &b) const {
+        return std::get<0>(a) > std::get<0>(b); // Min-heap
+    }
+};
