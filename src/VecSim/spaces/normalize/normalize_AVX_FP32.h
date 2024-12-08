@@ -47,7 +47,7 @@ void FP32_normIMD16_AVX(const void *pVect1v,size_t dimension) {
         __mmask8 constexpr mask8 = (1 << (residual % 8)) - 1;
         __m256 v1 = my_mm256_maskz_loadu_ps<mask8>(pVect1);
         pVect1 += residual % 8;
-        sumPowerReg = (power,_mm256_mul_ps(v1, v1));
+        sumPowerReg = _mm256_mul_ps(v1, v1);
     }
 
     // If the reminder is >=8, have another step of 8 floats
