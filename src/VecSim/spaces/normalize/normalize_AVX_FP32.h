@@ -37,7 +37,7 @@ static inline void divStep(float *&pVect1,__m256 &normFactor) {
 template <unsigned char residual> // 0..15
 void FP32_normIMD16_AVX(const void *pVect1v,size_t dimension) {
     float *pVect1 = (float *)pVect1v;
-
+    float *pVectOrig = pVect1;
     const float *pEnd1 = pVect1 + dimension;
 
     __m256 sumPowerReg = _mm256_setzero_ps();
@@ -66,6 +66,7 @@ void FP32_normIMD16_AVX(const void *pVect1v,size_t dimension) {
     } while (pVect1 < pEnd1);
 
 
+    pVect1 = pVectOrig;
 
     float sumOfPower = my_mm256_reduce_add_ps(sumPowerReg);
     __m256 normFactor = _mm256_set1_ps(sqrt(sumOfPower));
