@@ -10,6 +10,7 @@
 #include "VecSim/spaces/spaces.h"
 #include "VecSim/spaces/IP_space.h"
 #include "VecSim/spaces/L2_space.h"
+#include "VecSim/spaces/norm.h"
 #include "VecSim/spaces/normalize/normalize_naive.h"
 
 #include <stdexcept>
@@ -71,17 +72,18 @@ dist_func_t<double> GetDistFunc<double, double>(VecSimMetric metric, size_t dim,
 }
 
 template <>
-normalizeVector_f<float> GetNormalizeFunc<float>(void) {
-    return normalizeVector_imp<float>;
+normalizeVector_f<float> GetNormalizeFunc<float>(size_t dim, unsigned char *alignment) {
+    return norm_FP32_GetNormalizeFunc(dim, alignment);
 }
 
 template <>
-normalizeVector_f<double> GetNormalizeFunc<double>(void) {
+normalizeVector_f<double> GetNormalizeFunc<double>(size_t dim, unsigned char *alignment) {
     return normalizeVector_imp<double>;
 }
 
 template <>
-normalizeVector_f<vecsim_types::bfloat16> GetNormalizeFunc<vecsim_types::bfloat16>(void) {
+normalizeVector_f<vecsim_types::bfloat16>
+GetNormalizeFunc<vecsim_types::bfloat16>(size_t dim, unsigned char *alignment) {
     if (is_little_endian()) {
         return bfloat16_normalizeVector<true>;
     } else {
@@ -90,7 +92,8 @@ normalizeVector_f<vecsim_types::bfloat16> GetNormalizeFunc<vecsim_types::bfloat1
 }
 
 template <>
-normalizeVector_f<vecsim_types::float16> GetNormalizeFunc<vecsim_types::float16>(void) {
+normalizeVector_f<vecsim_types::float16>
+GetNormalizeFunc<vecsim_types::float16>(size_t dim, unsigned char *alignment) {
     return float16_normalizeVector;
 }
 

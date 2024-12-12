@@ -106,7 +106,8 @@ public:
           blockSize(params.blockSize ? params.blockSize : DEFAULT_BLOCK_SIZE),
           indexCalculator(components.indexCalculator), preprocessors(components.preprocessors),
           alignment(preprocessors->getAlignment()), lastMode(EMPTY_MODE), isMulti(params.multi),
-          logCallbackCtx(params.logCtx), normalize_func(spaces::GetNormalizeFunc<DataType>()) {
+          logCallbackCtx(params.logCtx),
+          normalize_func(spaces::GetNormalizeFunc<DataType>(dim, nullptr)) {
         assert(VecSimType_sizeof(vecType));
     }
 

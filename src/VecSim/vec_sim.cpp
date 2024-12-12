@@ -131,13 +131,13 @@ extern "C" size_t VecSimIndex_EstimateElementSize(const VecSimParams *params) {
 
 extern "C" void VecSim_Normalize(void *blob, size_t dim, VecSimType type) {
     if (type == VecSimType_FLOAT32) {
-        spaces::GetNormalizeFunc<float>()(blob, dim);
+        spaces::GetNormalizeFunc<float>(dim, nullptr)(blob, dim);
     } else if (type == VecSimType_FLOAT64) {
-        spaces::GetNormalizeFunc<double>()(blob, dim);
+        spaces::GetNormalizeFunc<double>(dim, nullptr)(blob, dim);
     } else if (type == VecSimType_BFLOAT16) {
-        spaces::GetNormalizeFunc<vecsim_types::bfloat16>()(blob, dim);
+        spaces::GetNormalizeFunc<vecsim_types::bfloat16>(dim, nullptr)(blob, dim);
     } else if (type == VecSimType_FLOAT16) {
-        spaces::GetNormalizeFunc<vecsim_types::float16>()(blob, dim);
+        spaces::GetNormalizeFunc<vecsim_types::float16>(dim, nullptr)(blob, dim);
     }
 }
 

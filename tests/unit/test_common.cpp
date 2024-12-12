@@ -326,7 +326,7 @@ TYPED_TEST(UtilsTests, VecSim_Normalize_Vector) {
     v[dim - 1] = exp(44);
 
     // Normalize the vector
-    spaces::GetNormalizeFunc<TypeParam>()(v, dim);
+    spaces::GetNormalizeFunc<TypeParam>(dim, nullptr)(v, dim);
 
     // Check that the normelized vector norm is 1
     TypeParam norm = 0;

@@ -38,8 +38,8 @@ template <typename DataType>
 class CosinePreprocessor : public PreprocessorInterface {
 public:
     CosinePreprocessor(std::shared_ptr<VecSimAllocator> allocator, size_t dim)
-        : PreprocessorInterface(allocator), normalize_func(spaces::GetNormalizeFunc<DataType>()),
-          dim(dim) {}
+        : PreprocessorInterface(allocator),
+          normalize_func(spaces::GetNormalizeFunc<DataType>(dim, nullptr)), dim(dim) {}
 
     // If a blob (storage_blob or query_blob) is not nullptr, it means a previous preprocessor
     // already allocated and processed it. So, we process it inplace. If it's null, we need to

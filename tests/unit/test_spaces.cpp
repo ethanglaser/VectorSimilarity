@@ -111,8 +111,8 @@ TEST_F(SpacesTest, float_ip_no_optimization_func_test) {
         b[i] = float(i + 1.5);
     }
 
-    spaces::GetNormalizeFunc<float>()(a, dim);
-    spaces::GetNormalizeFunc<float>()(b, dim);
+    spaces::GetNormalizeFunc<float>(dim, nullptr)(a, dim);
+    spaces::GetNormalizeFunc<float>(dim, nullptr)(b, dim);
 
     float dist = FP32_InnerProduct((const void *)a, (const void *)b, dim);
     ASSERT_FLOAT_EQ(dist, 0.0f);
@@ -127,8 +127,8 @@ TEST_F(SpacesTest, double_ip_no_optimization_func_test) {
         b[i] = double(i + 1.5);
     }
 
-    spaces::GetNormalizeFunc<double>()(a, dim);
-    spaces::GetNormalizeFunc<double>()(b, dim);
+    spaces::GetNormalizeFunc<double>(dim, nullptr)(a, dim);
+    spaces::GetNormalizeFunc<double>(dim, nullptr)(b, dim);
 
     double dist = FP64_InnerProduct((const void *)a, (const void *)b, dim);
     ASSERT_NEAR(dist, 0.0, 0.00000001);
@@ -145,8 +145,8 @@ TEST_F(SpacesTest, bf16_normalize_test) {
         a[i] = vecsim_types::float_to_bf16(sanity_a[i]);
     }
 
-    spaces::GetNormalizeFunc<bfloat16>()(a, dim);
-    spaces::GetNormalizeFunc<float>()(sanity_a, dim);
+    spaces::GetNormalizeFunc<bfloat16>(dim, nullptr)(a, dim);
+    spaces::GetNormalizeFunc<float>(dim, nullptr)(sanity_a, dim);
     // Convert assuming little endian system
     for (size_t i = 0; i < dim; i++) {
         ASSERT_EQ(vecsim_types::bfloat16_to_float32(a[i]), sanity_a[i])
@@ -167,8 +167,8 @@ TEST_F(SpacesTest, fp16_normalize_test) {
         a[i] = vecsim_types::FP32_to_FP16(sanity_a[i]);
     }
 
-    spaces::GetNormalizeFunc<float16>()(a, dim);
-    spaces::GetNormalizeFunc<float>()(sanity_a, dim);
+    spaces::GetNormalizeFunc<float16>(dim, nullptr)(a, dim);
+    spaces::GetNormalizeFunc<float>(dim, nullptr)(sanity_a, dim);
     for (size_t i = 0; i < dim; i++) {
         ASSERT_EQ(vecsim_types::FP16_to_FP32(a[i]), sanity_a[i])
             << " fp16 normalization failed for i = " << i;

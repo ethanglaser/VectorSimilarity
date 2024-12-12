@@ -80,6 +80,7 @@ add_library(VectorSimilaritySpaces
 	L2_space.cpp
 	IP_space.cpp
 	spaces.cpp
+	norm.cpp
 	${OPTIMIZATIONS}
 	computer/preprocessor_container.cpp
 )

@@ -23,7 +23,7 @@ template <typename DataType>
 using normalizeVector_f = void (*)(void *input_vector, const size_t dim);
 
 template <typename DataType>
-normalizeVector_f<DataType> GetNormalizeFunc();
+normalizeVector_f<DataType> GetNormalizeFunc(size_t dim, unsigned char *alignment);
 
 static int inline is_little_endian() {
     unsigned int x = 1;
