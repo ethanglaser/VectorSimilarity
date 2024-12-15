@@ -1,0 +1,30 @@
+import json
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import os
+
+JSON_DIR = "result_jsons/"
+JSON = JSON_DIR+"AVX_FP32.json"
+with open(JSON,'r') as f:
+    json_data = json.load(f)
+data = pd.DataFrame(json_data["benchmarks"])
+NAME_COL = 'name'
+data["dim"] = data.apply(lambda L : int(L[NAME_COL].split('/')[-1]),axis=1)
+data[NAME_COL] = data.apply(lambda L : L[NAME_COL].split('/')[0],axis=1)
+print(data.columns)
+for run in data[NAME_COL].unique():
+    run_data = data[data[NAME_COL]==run]
+    plt.plot(run_data["dim"],run_data["real_time"], label = run)
+
+# plt.xlim((1700,2048))
+# plt.ylim((350,500))
+plt.xlabel("vector dim")
+plt.ylabel("real time")
+plt.title(JSON.replace('.json',''))  
+plt.legend()
+
+OUTPUT_DIR = 'result_figs/'
+os.makedirs(OUTPUT_DIR,exist_ok=True)
+OUTPUT_FIG = OUTPUT_DIR+os.path.basename(JSON).replace('.json','.png')
+plt.savefig(OUTPUT_FIG)

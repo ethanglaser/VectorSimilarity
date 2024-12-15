@@ -1,0 +1,51 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "C/C++: gcc build active file",
+            "command": "/usr/bin/g++",
+            "args": [
+                "${file}",
+                "-o",
+                "${fileDirname}/${fileBasenameNoExtension}",
+                "-mavx"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": ["$gcc"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Default build task for C++ files."
+        },
+        {
+            "type": "cppbuild",
+            "label": "C/C++: gcc build BenchmarkTest.cpp",
+            "command": "/usr/bin/g++",
+            "args": [
+                "Testers/BenchmarkTest.cpp",     // Use the correct relative path
+                "-std=c++17",
+                "-isystem benchmark/include",
+                "-Lbenchmark/build/src",
+                "-lbenchmark",
+                "-lpthread",
+                "-O3",
+                "-o",
+                "${fileBasenameNoExtension}",
+				"-mavx",
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"   // Set working directory to the workspace root
+            },
+            "problemMatcher": ["$gcc"],
+            "group": {
+                "kind": "build",
+                "isDefault": false            // Do not make this the default task
+            },
+            "detail": "Special build task for BenchmarkTest.cpp."
+        }
+    ]
+}
