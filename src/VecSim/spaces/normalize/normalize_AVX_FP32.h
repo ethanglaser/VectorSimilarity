@@ -1,3 +1,7 @@
+
+#include <chrono>
+#include <thread>
+
 static inline void powerStep(float *&pVect1, __m256 &sumPowerReg) {
 
     __m256 v1 = _mm256_loadu_ps(pVect1);
@@ -22,6 +26,9 @@ static inline void divStep(float *&pVect1, __m256 &normFactor) {
 //           and loads it into the vector (operation is inplace)
 template <unsigned char residual> // 0..15
 static void FP32_normalizeSIMD16_AVX(void *pVect1v, size_t dimension) {
+    std::cout<<"Are you using this?"<<std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(10000);
+
     float *pVect1 = (float *)pVect1v;
     float *pEnd1 = pVect1 + dimension;
 
