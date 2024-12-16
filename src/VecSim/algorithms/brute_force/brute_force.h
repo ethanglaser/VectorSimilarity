@@ -25,9 +25,6 @@
 #include <ranges>
 #include <sys/param.h>
 
-#include <chrono>
-#include <thread>
-
 using spaces::dist_func_t;
 
 template <typename DataType, typename DistType>
@@ -223,6 +220,23 @@ BruteForceIndex<DataType, DistType>::getVectorsIterator() const {
     return vectors->getIterator();
 }
 
+
+template <typename DistType>
+struct VectorPair
+{
+    DistType dist;
+    labelType label;
+    VectorPair(const DistType& dist, const labelType& label):dist(dist), label(label){}
+    bool operator<(const VectorPair& other) const
+    {
+        return dist < other.dist;
+    }
+    bool operator>(const VectorPair& other) const
+    {
+        return dist > other.dist;
+    }
+};
+
 template <typename DataType, typename DistType>
 VecSimQueryReply *
 BruteForceIndex<DataType, DistType>::topKQuery(const void *queryBlob, size_t k,
@@ -245,7 +259,7 @@ BruteForceIndex<DataType, DistType>::topKQuery(const void *queryBlob, size_t k,
     // starting with container, reserving memory for speed
     // this is the container Omer is familiar with so should? be changes later
     //  Q - I see below (line 262) assert curr_id == count, should I use count instead of size?
-    std::vector<std::tuple<DistType, labelType>> heap1;
+    std::vector<VectorPair<DistType>> heap1;
     heap1.reserve(vectors->size());
     // Step 1 - make a container (c++ vector) of vector distance scores
 
@@ -262,22 +276,20 @@ BruteForceIndex<DataType, DistType>::topKQuery(const void *queryBlob, size_t k,
     assert(curr_id == this->count);
 
     if (this->count <= k) {
-        std::sort(heap1.begin(), heap1.end(),
-                  [](const auto &a, const auto &b) { return std::get<0>(a) < std::get<0>(b); });
+        std::sort(heap1.begin(), heap1.end());
         rep->results.resize(this->count);
         auto result_iter = rep->results.begin();
         for (const auto &vect : heap1) {
-            std::tie(result_iter->score, result_iter->id) = vect;
+            result_iter->score = vect.dist;
+            result_iter->id = vect.label;
             ++result_iter;
         }
         return rep;
     }
-    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     // Step 2 - min heapify H1
     // The comparator should probably be written outsize
-    std::make_heap(heap1.begin(), heap1.end(),
-                   [](const auto &a, const auto &b) { return std::get<0>(a) > std::get<0>(b); });
+    std::make_heap(heap1.begin(), heap1.end(),std::greater<>{});
 
     // Step 3 Create empty candidate heap - H2
     //  Its size is not going to be bigger then 2k so it can be reserved
@@ -288,7 +300,7 @@ BruteForceIndex<DataType, DistType>::topKQuery(const void *queryBlob, size_t k,
 
     // Step4 - insert root of H1 into H2
     // The root of H1 is in the front of the vector
-    heap2.emplace_back(std::get<0>(heap1.front()), 0);
+    heap2.emplace_back(heap1.front().dist, 0);
 
     // Steps 5 and 6 loop
 
@@ -299,8 +311,9 @@ BruteForceIndex<DataType, DistType>::topKQuery(const void *queryBlob, size_t k,
         // Step 5 insert root of H2 into result
         auto selected = heap2.front();
         size_t selected_heap1_index = std::get<1>(selected);
-        std::tie(result_iter->score, result_iter->id) = heap1[selected_heap1_index];
-        counter++;
+        const auto vect = heap1[selected_heap1_index];
+        result_iter->score = vect.dist;
+        result_iter->id = vect.label;
         if (counter >= k)
         // This check might be faulty loop logic or bad coding but works for now
         // but it is important to check to avoid redundant pop and 2 inserts
@@ -317,7 +330,7 @@ BruteForceIndex<DataType, DistType>::topKQuery(const void *queryBlob, size_t k,
         size_t left_child = 2 * selected_heap1_index + 1;
 
         if (left_child < heap1.size()) {
-            heap2.emplace_back(std::get<0>(heap1[left_child]), left_child);
+            heap2.emplace_back(heap1[left_child].dist, left_child);
             std::push_heap(heap2.begin(), heap2.end(), [](const auto &a, const auto &b) {
                 return std::get<0>(a) > std::get<0>(b);
             });
@@ -326,7 +339,7 @@ BruteForceIndex<DataType, DistType>::topKQuery(const void *queryBlob, size_t k,
         size_t right_child = 2 * selected_heap1_index + 2;
 
         if (left_child < heap1.size()) {
-            heap2.emplace_back(std::get<0>(heap1[right_child]), right_child);
+            heap2.emplace_back(heap1[right_child].dist, right_child);
             std::push_heap(heap2.begin(), heap2.end(), [](const auto &a, const auto &b) {
                 return std::get<0>(a) > std::get<0>(b);
             });
