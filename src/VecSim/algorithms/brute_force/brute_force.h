@@ -220,13 +220,21 @@ BruteForceIndex<DataType, DistType>::getVectorsIterator() const {
     return vectors->getIterator();
 }
 
+
 template <typename DistType>
-struct VectorPair {
+struct VectorPair
+{
     DistType dist;
     labelType label;
-    VectorPair(const DistType &dist, const labelType &label) : dist(dist), label(label) {}
-    bool operator<(const VectorPair &other) const { return dist < other.dist; }
-    bool operator>(const VectorPair &other) const { return dist > other.dist; }
+    VectorPair(const DistType& dist, const labelType& label):dist(dist), label(label){}
+    bool operator<(const VectorPair& other) const
+    {
+        return dist < other.dist;
+    }
+    bool operator>(const VectorPair& other) const
+    {
+        return dist > other.dist;
+    }
 };
 
 template <typename DataType, typename DistType>
@@ -281,7 +289,7 @@ BruteForceIndex<DataType, DistType>::topKQuery(const void *queryBlob, size_t k,
 
     // Step 2 - min heapify H1
     // The comparator should probably be written outsize
-    std::make_heap(heap1.begin(), heap1.end(), std::greater<>{});
+    std::make_heap(heap1.begin(), heap1.end(),std::greater<>{});
 
     // Step 3 Create empty candidate heap - H2
     //  Its size is not going to be bigger then 2k so it can be reserved
