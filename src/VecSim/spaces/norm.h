@@ -10,4 +10,6 @@
 namespace spaces {
 normalizeVector_f<float> norm_FP32_GetNormalizeFunc(size_t dim, unsigned char *alignment = nullptr,
                                                     const void *arch_opt = nullptr);
+normalizeVector_f<double> norm_FP64_GetNormalizeFunc(size_t dim, unsigned char *alignment = nullptr,
+                                                     const void *arch_opt = nullptr);
 } // namespace spaces

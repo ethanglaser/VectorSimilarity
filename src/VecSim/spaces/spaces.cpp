@@ -78,7 +78,7 @@ normalizeVector_f<float> GetNormalizeFunc<float>(size_t dim, unsigned char *alig
 
 template <>
 normalizeVector_f<double> GetNormalizeFunc<double>(size_t dim, unsigned char *alignment) {
-    return normalizeVector_imp<double>;
+    return norm_FP64_GetNormalizeFunc(dim, alignment);
 }
 
 template <>

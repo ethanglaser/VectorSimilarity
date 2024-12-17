@@ -33,3 +33,9 @@ static inline float my_mm256_reduce_add_ps(__m256 x) {
     return TmpRes[0] + TmpRes[1] + TmpRes[2] + TmpRes[3] + TmpRes[4] + TmpRes[5] + TmpRes[6] +
            TmpRes[7];
 }
+
+static inline float my_mm256_reduce_add_pd(__m256d x) {
+    double PORTABLE_ALIGN32 TmpRes[4];
+    _mm256_store_pd(TmpRes, x);
+    return TmpRes[0] + TmpRes[1] + TmpRes[2] + TmpRes[3];
+}

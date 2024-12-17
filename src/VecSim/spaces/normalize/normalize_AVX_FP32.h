@@ -1,5 +1,6 @@
 
 #include "VecSim/spaces/space_includes.h"
+#include "VecSim/spaces/AVX_utils.h"
 
 static inline void powerStep(float *&pVect1, __m256 &sumPowerReg) {
 

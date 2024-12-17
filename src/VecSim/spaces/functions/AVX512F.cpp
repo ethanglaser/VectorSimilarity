@@ -14,6 +14,9 @@
 #include "VecSim/spaces/IP/IP_AVX512F_FP32.h"
 #include "VecSim/spaces/IP/IP_AVX512F_FP64.h"
 
+#include "VecSim/spaces/normalize/normalize_AVX512F_FP32.h"
+#include "VecSim/spaces/normalize/normalize_AVX512F_FP64.h"
+
 namespace spaces {
 
 #include "implementation_chooser.h"
@@ -51,6 +54,18 @@ dist_func_t<float> Choose_FP16_IP_implementation_AVX512F(size_t dim) {
 dist_func_t<float> Choose_FP16_L2_implementation_AVX512F(size_t dim) {
     dist_func_t<float> ret_dist_func;
     CHOOSE_IMPLEMENTATION(ret_dist_func, dim, 32, FP16_L2SqrSIMD32_AVX512);
+    return ret_dist_func;
+}
+
+normalizeVector_f<float> Choose_FP32_normalize_implementation_AVX512F(size_t dim) {
+    normalizeVector_f<float> ret_dist_func;
+    CHOOSE_IMPLEMENTATION(ret_dist_func, dim, 16, FP32_normalizeSIMD16_AVX512);
+    return ret_dist_func;
+}
+
+normalizeVector_f<double> Choose_FP64_normalize_implementation_AVX512F(size_t dim) {
+    normalizeVector_f<double> ret_dist_func;
+    CHOOSE_IMPLEMENTATION(ret_dist_func, dim, 8, FP64_normalizeSIMD8_AVX512);
     return ret_dist_func;
 }
 
