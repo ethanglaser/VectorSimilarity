@@ -14,9 +14,9 @@ static inline void powerStep(float *&pVect1, __m256 &sumPowerReg) {
 static inline void divStep(float *&pVect1, __m256 &normFactor) {
 
     __m256 v1 = _mm256_loadu_ps(pVect1);
-    _mm256_storeu_ps(pVect1,_mm256_mul_ps (v1,normFactor));
+    _mm256_storeu_ps(pVect1, _mm256_mul_ps(v1, normFactor));
 
-    pVect1 += 8; 
+    pVect1 += 8;
 }
 
 // normalize inplace
@@ -57,7 +57,7 @@ static void FP32_normalizeSIMD16_AVX(void *pVect1v, size_t dimension) {
 
     float sumOfPower = my_mm256_reduce_add_ps(sumPowerReg);
     __m256 normFactor = _mm256_rsqrt_ps(_mm256_set1_ps(sumOfPower));
-    
+
     // Deal with 1-7 floats with mask loading, if needed
     if constexpr (residual % 8) {
         /*
@@ -68,22 +68,21 @@ static void FP32_normalizeSIMD16_AVX(void *pVect1v, size_t dimension) {
         */
         __mmask8 constexpr mask8 = (1 << (residual % 8)) - 1;
         __m256 v1 = _mm256_loadu_ps(pVect1);
-        __m256 blend = _mm256_blend_ps(v1,_mm256_mul_ps(v1,normFactor),mask8);
-        _mm256_storeu_ps(pVect1,blend);
+        __m256 blend = _mm256_blend_ps(v1, _mm256_mul_ps(v1, normFactor), mask8);
+        _mm256_storeu_ps(pVect1, blend);
 
         pVect1 += residual % 8;
     }
 
     // If the reminder is >=8, have another step of 8 floats
     if constexpr (residual >= 8) {
-        divStep(pVect1,normFactor);
+        divStep(pVect1, normFactor);
     }
 
     do {
-        divStep(pVect1, normFactor);     
-        divStep(pVect1, normFactor);     
+        divStep(pVect1, normFactor);
+        divStep(pVect1, normFactor);
 
-        // can reduce now or in the end of the loop, check both benchmark   
+        // can reduce now or in the end of the loop, check both benchmark
     } while (pVect1 < pEnd1);
-
 }

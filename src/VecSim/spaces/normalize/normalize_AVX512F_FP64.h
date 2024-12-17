@@ -22,9 +22,9 @@ static inline void divStep(double *&pVect1, __m512d &normFactor) {
 
     __m512d v1 = _mm512_loadu_pd(pVect1);
 
-    _mm512_storeu_pd(pVect1,_mm512_mul_pd (v1,normFactor));
+    _mm512_storeu_pd(pVect1, _mm512_mul_pd(v1, normFactor));
 
-    pVect1 += 8; 
+    pVect1 += 8;
 }
 
 // residual:  512/64 = 8
@@ -54,7 +54,7 @@ static void FP64_normalizeSIMD8_AVX512(void *pVect1v, size_t dimension) {
     if constexpr (residual) {
         __mmask16 constexpr mask8 = (1 << (residual)) - 1;
         __m512d v1 = _mm512_loadu_pd(pVect1);
-        _mm512_mask_storeu_pd(pVect1,mask8,_mm512_mul_pd(v1,normFactor));
+        _mm512_mask_storeu_pd(pVect1, mask8, _mm512_mul_pd(v1, normFactor));
         pVect1 += residual;
     }
     do {

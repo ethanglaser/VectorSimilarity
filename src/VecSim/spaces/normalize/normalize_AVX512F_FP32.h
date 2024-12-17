@@ -17,14 +17,13 @@ static inline void powerStep(float *&pVect1, __m512 &sumPowerReg) {
     sumPowerReg = _mm512_fmadd_ps(v1, v1, sumPowerReg);
 }
 
-static inline void divStep(float *&pVect1,__m512 &normFactor) {
+static inline void divStep(float *&pVect1, __m512 &normFactor) {
 
     __m512 v1 = _mm512_loadu_ps(pVect1);
 
-    _mm512_storeu_ps(pVect1,_mm512_mul_ps(v1,normFactor));
+    _mm512_storeu_ps(pVect1, _mm512_mul_ps(v1, normFactor));
 
-    pVect1 += 16; 
-
+    pVect1 += 16;
 }
 
 // residual:  512/32 = 16
@@ -54,7 +53,7 @@ static void FP32_normalizeSIMD16_AVX512(void *pVect1v, size_t dimension) {
     if constexpr (residual) {
         __mmask16 constexpr mask8 = (1 << (residual)) - 1;
         __m512 v1 = _mm512_loadu_ps(pVect1);
-        _mm512_mask_storeu_ps(pVect1,mask8,_mm512_mul_ps(v1,normFactor));
+        _mm512_mask_storeu_ps(pVect1, mask8, _mm512_mul_ps(v1, normFactor));
         pVect1 += residual;
     }
     do {
