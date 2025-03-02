@@ -12,6 +12,7 @@ on:
           - benchmarks-all
           - benchmarks-default
           - bm-basics-int8-single
+          - bm-basics-int8-multi
           - bm-basics-fp32-single
           - bm-basics-fp32-multi
           - bm-basics-fp64-single
