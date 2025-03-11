@@ -23,15 +23,16 @@ if (CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64")
 		message(FATAL_ERROR "Could not find Arm Performance Libraries header in ${ARMPL_INCLUDE_DIR}")
 	endif()
 
-
 	# Find the ArmPL library (for 32-bit integer mode, commonly named armpl_lp64)
-	find_library(ARMPL_LIB NAMES armpl_lp64_mp HINTS ${ARMPL_LIBRARY_DIR})
+	find_library(ARMPL_LIB NAMES armpl_lp64 HINTS ${ARMPL_LIBRARY_DIR})
 	if(ARMPL_LIB)
 		message(STATUS "Found Arm Performance Libraries: ${ARMPL_LIB}")
 	else()
 		message(FATAL_ERROR "Arm Performance Libraries not found in ${ARMPL_LIBRARY_DIR}")
 	endif()
 
+	# Add a definition so that code can check if ArmPL is available
+	add_compile_definitions(OPT_ARMPL)
 endif()
 
 
@@ -109,41 +110,39 @@ if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "(x86_64)|(AMD64|amd64)|(^i.86$)")
 		set_source_files_properties(functions/SSE.cpp PROPERTIES COMPILE_FLAGS -msse)
 		list(APPEND OPTIMIZATIONS functions/SSE.cpp)
 	endif()
-# elseif(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64")
-#     # aarch64-specific optimizations.
-#     message("Building with NEON support for aarch64")
-#     # Optionally include an ARM-specific cmake file for additional checks.
-#     # include(${root}/cmake/aarch64NeonFlags.cmake)
-#     # Add your NEON-specific source file and compile flags.
-#     list(APPEND OPTIMIZATIONS functions/NEONF.cpp)
 endif()
 
 if (CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64")
 	message(STATUS "Enabling Arm Performance Libraries integration")
 	include(${root}/cmake/aarch64InstructionFlags.cmake)
 
+	# Create different optimization implementations for ARM architecture
+	# ArmPL used for standard ARMv8-A with NEON
 	if (CXX_ARMV8A)
-		message("Building with ARMV8A")
+		message("Building with ARMV8A and ArmPL")
 		set_source_files_properties(functions/NEONF.cpp PROPERTIES COMPILE_FLAGS "-march=armv8-a")
+		list(APPEND OPTIMIZATIONS functions/NEONF.cpp)
 	endif()
 
+	# ArmPL with SVE support
 	if (CXX_SVE)
-		message("Building with SVE")
-		set_source_files_properties(functions/NEONF.cpp PROPERTIES COMPILE_FLAGS "-march=armv8-a+sve")
+		message("Building with SVE and ArmPL")
+		set_source_files_properties(functions/SVE.cpp PROPERTIES COMPILE_FLAGS "-march=armv8-a+sve")
+		list(APPEND OPTIMIZATIONS functions/SVE.cpp)
 	endif()
 
+	# ArmPL with SVE2 support
 	if (CXX_SVE2)
-		message("Building with SVE2")
-		set_source_files_properties(functions/NEONF.cpp PROPERTIES COMPILE_FLAGS "-march=armv8.2-a+sve2")
+		message("Building with SVE2 and ArmPL")
+		set_source_files_properties(functions/SVE2.cpp PROPERTIES COMPILE_FLAGS "-march=armv8.2-a+sve2")
+		list(APPEND OPTIMIZATIONS functions/SVE2.cpp)
 	endif()
 
 	if (CXX_ARMV9)
-		message("Building with ARMV9")
-		set_source_files_properties(functions/NEONF.cpp PROPERTIES COMPILE_FLAGS "-march=armv9.2-a+sve2")
+		message("Building with ARMV9 and ArmPL")
+		set_source_files_properties(functions/ARMV9.cpp PROPERTIES COMPILE_FLAGS "-march=armv9.2-a+sve2")
+		list(APPEND OPTIMIZATIONS functions/ARMV9.cpp)
 	endif()
-
-    list(APPEND OPTIMIZATIONS functions/NEONF.cpp) 
-
 endif()
 
 # Here we are compiling the space selectors with the relevant optimization flag.
