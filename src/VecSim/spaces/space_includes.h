@@ -15,7 +15,6 @@
 
 #ifdef CPU_FEATURES_ARCH_AARCH64
 #include "cpuinfo_aarch64.h"
-#include <arm_neon.h>
 #endif // CPU_FEATURES_ARCH_AARCH64
 
 

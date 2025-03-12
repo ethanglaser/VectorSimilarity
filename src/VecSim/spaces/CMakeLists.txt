@@ -8,34 +8,6 @@ add_library(VectorSimilaritySpaces_no_optimization
 	IP/IP.cpp
 )
 
-
-if (CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64")
-	message(STATUS "Including Arm Performance Libraries")
-	# Set default install paths – adjust these if needed.
-	set(ARMPL_INCLUDE_DIR "/opt/arm/armpl_24.10_gcc/include")
-	set(ARMPL_LIBRARY_DIR "/opt/arm/armpl_24.10_gcc/lib")
-
-	# Verify that the header exists.
-	if(EXISTS "${ARMPL_INCLUDE_DIR}/armpl.h")
-		message(STATUS "Found Arm Performance Libraries header in ${ARMPL_INCLUDE_DIR}")
-		include_directories(${ARMPL_INCLUDE_DIR})
-	else()
-		message(FATAL_ERROR "Could not find Arm Performance Libraries header in ${ARMPL_INCLUDE_DIR}")
-	endif()
-
-	# Find the ArmPL library (for 32-bit integer mode, commonly named armpl_lp64)
-	find_library(ARMPL_LIB NAMES armpl_lp64 HINTS ${ARMPL_LIBRARY_DIR})
-	if(ARMPL_LIB)
-		message(STATUS "Found Arm Performance Libraries: ${ARMPL_LIB}")
-	else()
-		message(FATAL_ERROR "Arm Performance Libraries not found in ${ARMPL_LIBRARY_DIR}")
-	endif()
-
-	# Add a definition so that code can check if ArmPL is available
-	add_compile_definitions(OPT_ARMPL)
-endif()
-
-
 include(${root}/cmake/cpu_features.cmake)
 
 project(VectorSimilarity_Spaces)
@@ -116,32 +88,34 @@ if (CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64")
 	message(STATUS "Enabling Arm Performance Libraries integration")
 	include(${root}/cmake/aarch64InstructionFlags.cmake)
 
+	# Find and set up ARM Performance Libraries
+	find_library(ARMPL_LIB armpl_lp64 PATHS $ENV{ARMPL_LIBRARIES} $ENV{ARMPL_DIR}/lib)
+	if(NOT ARMPL_LIB)
+		message(STATUS "Could not find ARM Performance Libraries, trying to use -larmpl_lp64")
+		set(ARMPL_LIB "armpl_lp64")
+	else()
+		message(STATUS "Found ARM Performance Libraries: ${ARMPL_LIB}")
+	endif()
+
 	# Create different optimization implementations for ARM architecture
 	# ArmPL used for standard ARMv8-A with NEON
 	if (CXX_ARMV8A)
 		message("Building with ARMV8A and ArmPL")
-		set_source_files_properties(functions/NEONF.cpp PROPERTIES COMPILE_FLAGS "-march=armv8-a")
-		list(APPEND OPTIMIZATIONS functions/NEONF.cpp)
+		set_source_files_properties(functions/ARMPL_NEON.cpp PROPERTIES COMPILE_FLAGS "-march=armv8-a")
+		list(APPEND OPTIMIZATIONS functions/ARMPL_NEON.cpp)
 	endif()
 
-	# ArmPL with SVE support
-	if (CXX_SVE)
-		message("Building with SVE and ArmPL")
-		set_source_files_properties(functions/SVE.cpp PROPERTIES COMPILE_FLAGS "-march=armv8-a+sve")
-		list(APPEND OPTIMIZATIONS functions/SVE.cpp)
-	endif()
+	# # ArmPL with SVE2 support
+	# if (CXX_SVE)
+	# 	message("Building with SVE2 and ArmPL")
+	# 	set_source_files_properties(functions/ARMPL_SVE2.cpp PROPERTIES COMPILE_FLAGS "-march=armv8-a+sve2")
+	# 	list(APPEND OPTIMIZATIONS functions/ARMPL_SVE2.cpp)
+	# endif()
 
-	# ArmPL with SVE2 support
 	if (CXX_SVE2)
-		message("Building with SVE2 and ArmPL")
-		set_source_files_properties(functions/SVE2.cpp PROPERTIES COMPILE_FLAGS "-march=armv8.2-a+sve2")
-		list(APPEND OPTIMIZATIONS functions/SVE2.cpp)
-	endif()
-
-	if (CXX_ARMV9)
 		message("Building with ARMV9 and ArmPL")
-		set_source_files_properties(functions/ARMV9.cpp PROPERTIES COMPILE_FLAGS "-march=armv9.2-a+sve2")
-		list(APPEND OPTIMIZATIONS functions/ARMV9.cpp)
+		set_source_files_properties(functions/ARMPL_SVE2.cpp PROPERTIES COMPILE_FLAGS "-march=armv9-a+sve2")
+		list(APPEND OPTIMIZATIONS functions/ARMPL_SVE2.cpp)
 	endif()
 endif()
 

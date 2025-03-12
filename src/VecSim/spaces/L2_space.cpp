@@ -18,7 +18,8 @@
 #include "VecSim/spaces/functions/AVX512F_BW_VL_VNNI.h"
 #include "VecSim/spaces/functions/AVX2.h"
 #include "VecSim/spaces/functions/SSE3.h"
-#include "VecSim/spaces/functions/NEONF.h"
+#include "VecSim/spaces/functions/ARMPL_NEON.h"
+#include "VecSim/spaces/functions/ARMPL_SVE2.h"
 
 using bfloat16 = vecsim_types::bfloat16;
 using float16 = vecsim_types::float16;
@@ -30,19 +31,29 @@ dist_func_t<float> L2_FP32_GetDistFunc(size_t dim, unsigned char *alignment, con
     if (!alignment) {
         alignment = &dummy_alignment;
     }
-
     dist_func_t<float> ret_dist_func = FP32_L2Sqr;
     // Optimizations assume at least 16 floats. If we have less, we use the naive implementation.
     if (dim < 16) {
         return ret_dist_func;
     }
 
-// #ifdef CPU_FEATURES_ARCH_AARCH64
-//     if (dim % 4){
-//         *alignment = 4 * sizeof(float);
-//     }
-//     return Choose_FP32_L2_implementation_NEONF(dim);
-// #endif
+#ifdef CPU_FEATURES_ARCH_AARCH64
+    if (dim % 4){
+        *alignment = 4 * sizeof(float);
+    }
+    auto features = (arch_opt == nullptr)
+    ? cpu_features::GetAarch64Info().features
+    : *static_cast<const cpu_features::Aarch64Features *>(arch_opt);
+
+#ifdef OPT_SVE
+    if (features.sve2) {
+        return Choose_FP32_L2_implementation_ARMPL_SVE2(dim);
+    }
+#elif defined(OPT_NEON)
+    return Choose_FP32_L2_implementation_ARMPL_NEON(dim);
+#endif
+
+#endif
 
 #ifdef CPU_FEATURES_ARCH_X86_64
     auto features = (arch_opt == nullptr)
@@ -70,6 +81,7 @@ dist_func_t<float> L2_FP32_GetDistFunc(size_t dim, unsigned char *alignment, con
     }
 #endif
 #endif // __x86_64__
+
     return ret_dist_func;
 }
 
