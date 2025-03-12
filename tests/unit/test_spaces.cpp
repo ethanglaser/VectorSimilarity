@@ -403,7 +403,7 @@ TEST_P(FP32SpacesOptimizationTest, FP32L2SqrTest) {
      float baseline = FP32_L2Sqr(v, v2, dim);
      unsigned char alignment = 0;
      arch_opt_func = L2_FP32_GetDistFunc(dim, &alignment, &optimization);
-     ASSERT_EQ(arch_opt_func, Choose_FP32_L2_implementation_NEONF(dim))
+     ASSERT_EQ(arch_opt_func, Choose_FP32_L2_implementation_ARMPL_SVE2(dim))
          << "Unexpected distance function chosen for dim " << dim;
  }
  
@@ -426,7 +426,7 @@ TEST_P(FP32SpacesOptimizationTest, FP32L2SqrTest) {
      float baseline = FP32_InnerProduct(v, v2, dim);
      unsigned char alignment = 0;
      arch_opt_func = IP_FP32_GetDistFunc(dim, &alignment, &optimization);
-     ASSERT_EQ(arch_opt_func, Choose_FP32_IP_implementation_NEONF(dim))
+     ASSERT_EQ(arch_opt_func, Choose_FP32_IP_implementation_ARMPL_SVE2(dim))
          << "Unexpected distance function chosen for dim " << dim;
  }
  INSTANTIATE_TEST_SUITE_P(FP32OptFuncs, FP32SpacesOptimizationTest,
