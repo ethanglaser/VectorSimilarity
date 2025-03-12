@@ -5,9 +5,6 @@
  */
 
 #include "VecSim/spaces/space_includes.h"
-#ifdef OPT_NEON
- #include <armpl.h>
-#endif
 
 template <unsigned char residual> // 0..15
 float FP32_L2SqrSIMD16_ARMPL_NEON(const void *pVect1v, const void *pVect2v, size_t dimension) {

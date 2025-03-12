@@ -5,9 +5,6 @@
  */
 
 #include "VecSim/spaces/space_includes.h"
-#ifdef OPT_SVE
- #include <armpl.h>
-#endif
 
 template <unsigned char residual> // 0..15
 float FP32_InnerProductSIMD16_ARMPL_SVE2(const void *pVect1v, const void *pVect2v, size_t dimension) {
