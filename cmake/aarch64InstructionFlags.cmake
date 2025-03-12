@@ -12,7 +12,7 @@ CHECK_CXX_COMPILER_FLAG("-march=armv9-a+sve2" CXX_SVE2)
 # Only use ARMv9 if both compiler and CPU support it
 if(CXX_SVE2)
   message(STATUS "Using ARMv9.0-a with SVE2 (supported by CPU)")
-  add_compile_definitions(OPT_ARMV9)
+  add_compile_definitions(OPT_SVE2)
 endif()
 if (CXX_ARMV8A)
   add_compile_definitions(OPT_NEON)

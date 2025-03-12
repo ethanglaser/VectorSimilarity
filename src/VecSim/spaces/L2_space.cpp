@@ -45,7 +45,7 @@ dist_func_t<float> L2_FP32_GetDistFunc(size_t dim, unsigned char *alignment, con
     ? cpu_features::GetAarch64Info().features
     : *static_cast<const cpu_features::Aarch64Features *>(arch_opt);
 
-#ifdef OPT_SVE
+#ifdef OPT_SVE2
     if (features.sve2) {
         return Choose_FP32_L2_implementation_ARMPL_SVE2(dim);
     }

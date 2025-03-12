@@ -14,6 +14,7 @@
 #endif // CPU_FEATURES_ARCH_X86_64
 
 #ifdef CPU_FEATURES_ARCH_AARCH64
+#include <armpl.h>
 #include "cpuinfo_aarch64.h"
 #endif // CPU_FEATURES_ARCH_AARCH64
 

@@ -87,6 +87,7 @@ endif()
 if (CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "aarch64")
 	message(STATUS "Enabling Arm Performance Libraries integration")
 	include(${root}/cmake/aarch64InstructionFlags.cmake)
+	include_directories(${ARMPL_DIR}/include)
 
 	include($ENV{ARMPL_DIR}/armplConfig.cmake)
 	# Find and set up ARM Performance Libraries
