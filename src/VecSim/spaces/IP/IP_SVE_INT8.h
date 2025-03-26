@@ -7,7 +7,8 @@
 #include <arm_sve.h>
 
 // Aligned step using svptrue_b8()
-static inline void InnerProductStep(const int8_t *&pVect1, const int8_t *&pVect2, svfloat32_t &sum) {
+static inline void InnerProductStep(const int8_t *&pVect1, const int8_t *&pVect2,
+                                    svfloat32_t &sum) {
     svbool_t pg = svptrue_b8();
 
     svint8_t v1_i8 = svld1_s8(pg, pVect1);
@@ -88,5 +89,6 @@ float INT8_InnerProductSIMD_SVE(const void *pVect1v, const void *pVect2v, size_t
     sum0 = svadd_f32_z(svptrue_b32(), sum0, sum2);
 
     // Horizontal sum
-    return svaddv_f32(svptrue_b32(), sum0);
+    float result = svaddv_f32(svptrue_b32(), sum0);
+    return 1.0f - result;
 }
