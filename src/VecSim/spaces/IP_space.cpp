@@ -256,6 +256,12 @@ dist_func_t<float> IP_INT8_GetDistFunc(size_t dim, unsigned char *alignment, con
         return Choose_INT8_IP_implementation_SVE2(dim);
     }
 #endif
+#ifdef OPT_NEON
+    if (features.asimd) {
+        return Choose_INT8_IP_implementation_NEON(dim);
+    }
+#endif
+
 #endif // __x86_64__
     return ret_dist_func;
 }
@@ -294,6 +300,11 @@ dist_func_t<float> Cosine_INT8_GetDistFunc(size_t dim, unsigned char *alignment,
 #ifdef OPT_SVE2
     if (features.sve2) {
         return Choose_INT8_Cosine_implementation_SVE2(dim);
+    }
+#endif
+#ifdef OPT_NEON
+    if (features.asimd) {
+        return Choose_INT8_Cosine_implementation_NEON(dim);
     }
 #endif
 #endif // __x86_64__
