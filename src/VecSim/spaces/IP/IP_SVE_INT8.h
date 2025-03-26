@@ -34,7 +34,7 @@ static inline void InnerProductStep(const int8_t *&pVect1, const int8_t *&pVect2
 }
 
 template <bool partial_chunk, unsigned char additional_steps>
-float INT8_InnerProductSIMD_SVE(const void *pVect1v, const void *pVect2v, size_t dimension) {
+float INT8_InnerProductImp(const void *pVect1v, const void *pVect2v, size_t dimension) {
     const int8_t *pVect1 = reinterpret_cast<const int8_t *>(pVect1v);
     const int8_t *pVect2 = reinterpret_cast<const int8_t *>(pVect2v);
 
@@ -90,5 +90,22 @@ float INT8_InnerProductSIMD_SVE(const void *pVect1v, const void *pVect2v, size_t
 
     // Horizontal sum
     float result = svaddv_f32(svptrue_b32(), sum0);
-    return 1.0f - result;
+    return result;
+}
+
+template <bool partial_chunk, unsigned char additional_steps>
+float INT8_InnerProductSIMD_SVE(const void *pVect1v, const void *pVect2v, size_t dimension) {
+    return 1.0f - INT8_InnerProductImp<partial_chunk, additional_steps>(pVect1v, pVect2v, dimension);
+}
+
+template <bool partial_chunk, unsigned char additional_steps>
+float INT8_CosineSIMD_SVE(const void *pVect1v, const void *pVect2v, size_t dimension) {
+    float ip = INT8_InnerProductImp<residual>(pVect1v, pVect2v, dimension);
+    float norm_v1 =
+        *reinterpret_cast<const float *>(static_cast<const int8_t *>(pVect1v) + dimension);
+    float norm_v2 =
+        *reinterpret_cast<const float *>(static_cast<const int8_t *>(pVect2v) + dimension);
+
+    return 1.0f - ip / (norm_v1 * norm_v2);
+
 }
