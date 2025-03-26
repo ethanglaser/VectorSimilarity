@@ -36,7 +36,7 @@ static inline void L2SquareStep(const int8_t *&pVect1, const int8_t *&pVect2, sv
 }
 
 template <bool partial_chunk, unsigned char additional_steps>
-float INT8_L2SqrSIMD_SVE(const void *pVect1v, const void *pVect2v, size_t dimension) {
+float INT8_L2SqrSIMD_SVE2(const void *pVect1v, const void *pVect2v, size_t dimension) {
     const int8_t *pVect1 = reinterpret_cast<const int8_t *>(pVect1v);
     const int8_t *pVect2 = reinterpret_cast<const int8_t *>(pVect2v);
 

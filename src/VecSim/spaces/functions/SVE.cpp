@@ -37,6 +37,12 @@ dist_func_t<float> Choose_INT8_L2_implementation_SVE(size_t dim) {
     return ret_dist_func;
 }
 
+dist_func_t<float> Choose_INT8_Cosine_implementation_SVE(size_t dim) {
+    dist_func_t<float> ret_dist_func;
+    CHOOSE_SVE_IMPLEMENTATION(ret_dist_func, INT8_CosineSIMD_SVE, dim, svcntb);
+    return ret_dist_func;
+}
+
 #include "implementation_chooser_cleanup.h"
 
 } // namespace spaces

@@ -242,6 +242,11 @@ dist_func_t<float> L2_INT8_GetDistFunc(size_t dim, unsigned char *alignment, con
         return Choose_INT8_L2_implementation_SVE(dim);
     }
 #endif
+#ifdef OPT_SVE2
+    if (features.sve2) {
+        return Choose_INT8_L2_implementation_SVE2(dim);
+    }
+#endif
 #endif // __x86_64__
     return ret_dist_func;
 }
