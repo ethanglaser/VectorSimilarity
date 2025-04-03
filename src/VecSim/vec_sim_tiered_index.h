@@ -287,7 +287,7 @@ VecSimIndexDebugInfo VecSimTieredIndex<DataType, DistType>::debugInfo() const {
     case VecSimAlgo_HNSWLIB:
         info.tieredInfo.backendInfo.hnswInfo = backendInfo.hnswInfo;
         break;
-    case VecSimAlgo_SVS: // TODO: Add SVS info.
+    case VecSimAlgo_SVS:
         break;
     case VecSimAlgo_BF:
     case VecSimAlgo_TIERED:
